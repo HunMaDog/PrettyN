@@ -1,3 +1,6 @@
+/*
+ * Distributed under the MIT License (http://opensource.org/licenses/MIT)
+ */
 #ifndef MARKLAR_DETAIL_PRETTYN_TYPE_NAME_HPP
 #define MARKLAR_DETAIL_PRETTYN_TYPE_NAME_HPP
 
