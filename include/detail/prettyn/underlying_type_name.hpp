@@ -16,60 +16,37 @@ namespace marklar::detail::prettyn
  * Compiler dependent solutions
  */
 
-#if defined(__clang__)
-template<typename Type>
-constexpr std::string_view
-clang_pretty_type_name()
-{
-    std::string_view name{__PRETTY_FUNCTION__};
+#if defined(__GNUC__) and !defined(__clang__)
 
-    constexpr auto size_of_prefix{std::string_view{"std::string_view marklar::detail::prettyn::clang_pretty_type_name() [Type = "}.length()};
-    constexpr auto size_of_postfix{std::string_view{"]"}.length()};
+#    define PRETTYN_UNDERLYING_FUNCTION_NAME_GETTER __PRETTY_FUNCTION__
 
-    name.remove_prefix(size_of_prefix);
-    name.remove_suffix(size_of_postfix);
+static constexpr auto size_of_prefix{std::string_view{"constexpr auto marklar::detail::prettyn::type_name() [with Type = "}.length()};
+static constexpr auto size_of_suffix{std::string_view{"]"}.length()};
 
-    return name;
-}
+#elif defined(__clang__)
 
-#    define PRETTYN_TYPE_NAME_UNDERLYING_FUNCTION(TYPE) clang_pretty_type_name<TYPE>();
+#    define PRETTYN_UNDERLYING_FUNCTION_NAME_GETTER __PRETTY_FUNCTION__
 
-#elif defined(__GNUC__)
-template<typename Type>
-constexpr std::string_view
-gcc_pretty_type_name()
-{
-    std::string_view name{__PRETTY_FUNCTION__};
+static constexpr auto size_of_prefix{std::string_view{"auto marklar::detail::prettyn::type_name() [Type = "}.length()};
+static constexpr auto size_of_suffix{std::string_view{"]"}.length()};
 
-    constexpr auto size_of_prefix{std::string_view{"constexpr std::string_view marklar::detail::prettyn::gcc_pretty_type_name() [with Type = "}.length()};
-    constexpr auto size_of_postfix{std::string_view{"; std::string_view = std::basic_string_view<char>]"}.length()};
+#elif defined(__INTEL_LLVM_COMPILER)
 
-    name.remove_prefix(size_of_prefix);
-    name.remove_suffix(size_of_postfix);
+#    define PRETTYN_UNDERLYING_FUNCTION_NAME_GETTER __PRETTY_FUNCTION__
 
-    return name;
-}
-
-#    define PRETTYN_TYPE_NAME_UNDERLYING_FUNCTION(TYPE) gcc_pretty_type_name<TYPE>();
+static constexpr auto size_of_prefix{std::string_view{"auto marklar::detail::prettyn::type_name() [Type = "}.length()};
+static constexpr auto size_of_suffix{std::string_view{"]"}.length()};
 
 #elif defined(_MSC_VER)
-template<typename Type>
-constexpr std::string_view
-msvc_pretty_type_name()
-{
-    std::string_view name{__FUNCSIG__};
 
-    constexpr auto size_of_prefix{
-        std::string_view{"class std::basic_string_view<char,struct std::char_traits<char> > __cdecl marklar::detail::prettyn::msvc_pretty_type_name<"}.length()};
-    constexpr auto size_of_postfix{std::string_view{">(void)"}.length()};
+#    define PRETTYN_UNDERLYING_FUNCTION_NAME_GETTER __FUNCSIG__
 
-    name.remove_prefix(size_of_prefix);
-    name.remove_suffix(size_of_postfix);
+static constexpr auto size_of_prefix{std::string_view{"auto __cdecl marklar::detail::prettyn::type_name<"}.length()};
+static constexpr auto size_of_suffix{std::string_view{">(void)"}.length()};
 
-    return name;
-}
+#else
 
-#    define PRETTYN_TYPE_NAME_UNDERLYING_FUNCTION(TYPE) msvc_pretty_type_name<TYPE>();
+#    warning "Your compiler is not supported. Please modify this file in order to work properly."
 
 #endif
 

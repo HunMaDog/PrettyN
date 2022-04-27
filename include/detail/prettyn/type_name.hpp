@@ -20,10 +20,15 @@ constexpr auto
 type_name()
 {
     /*
-     * PRETTYN_TYPE_NAME_UNDERLYING_FUNCTION is defined in "underlying_type_name.hpp" and it is helps to separate the compiler
-     * dependent part and stable part. It is hold a template function call with the given type which returns with the pretty type name.
+     * PRETTYN_UNDERLYING_NAME_GETTER is defined in "underlying_type_name.hpp" and it is helps to separate the compiler
+     * dependent part and stable part. It is hold a compiler dependent define to get function name and size of prefix and suffix.
      */
-    return PRETTYN_TYPE_NAME_UNDERLYING_FUNCTION(Type);
+    std::string_view name{PRETTYN_UNDERLYING_FUNCTION_NAME_GETTER};
+
+    name.remove_prefix(size_of_prefix);
+    name.remove_suffix(size_of_suffix);
+
+    return name;
 }
 
 } // namespace marklar::detail::prettyn
